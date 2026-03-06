@@ -1,23 +1,18 @@
 import { defineConfig } from 'next';
+import { withTailwindCss } from 'next-tailwindcss';
 
-export default defineConfig({
+export default defineConfig(withTailwindCss({
   reactStrictMode: true,
   experimental: {
     appDir: true,
-  },
-  images: {
-    domains: ['your-image-domain.com'], // Add your allowed image domains here
+    serverActions: true,
   },
   env: {
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    STRIPE_PUBLIC_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY,
   },
-  eslint: {
-    dirs: ['src'], // Only run ESLint on the "src" directory during production builds
+  images: {
+    domains: ['your-image-domain.com'], // Update with allowed domains for images
   },
-  i18n: {
-    locales: ['en-US'],
-    defaultLocale: 'en-US',
-  },
-});
+}));
