@@ -1,32 +1,34 @@
-import React, { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
-import { useSession } from "@supabase/auth-helpers-react";
+import React, { useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import { useSession } from 'next-auth/react';
+import BookingForm from '@/components/BookingForm';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { Booking } from '@/types/booking';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const BookingsPage: React.FC = () => {
-  const session = useSession();
-  const [bookings, setBookings] = useState<any[]>([]);
+  const { data: session } = useSession();
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
   const fetchBookings = async () => {
+    if (!session?.user?.email) return;
+
     try {
-      if (!session) {
-        throw new Error("User not authenticated");
-      }
-
       const { data, error } = await supabase
-        .from("bookings")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .order("date", { ascending: true });
+        .from('bookings')
+        .select('*')
+        .eq('user_email', session.user.email);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      setBookings(data || []);
+      setBookings(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      console.error(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -36,26 +38,25 @@ const BookingsPage: React.FC = () => {
     fetchBookings();
   }, [session]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold">My Bookings</h1>
-      <ul className="mt-4">
-        {bookings.map((booking) => (
-          <li key={booking.id} className="border p-2 mb-2">
-            <h2 className="font-semibold">{booking.title}</h2>
-            <p>Date: {new Date(booking.date).toLocaleString()}</p>
-            <p>Details: {booking.details}</p>
-          </li>
-        ))}
-      </ul>
+      <h1 className="text-2xl font-semibold mb-4">Your Bookings</h1>
+      {bookings.length === 0 ? (
+        <p>No bookings found. Start creating your bookings!</p>
+      ) : (
+        <ul>
+          {bookings.map((booking) => (
+            <li key={booking.id} className="border p-2 mb-2 rounded">
+              <h2 className="font-bold">{booking.title}</h2>
+              <p>{booking.date}</p>
+              <p>{booking.time}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+      <BookingForm />
     </div>
   );
 };
