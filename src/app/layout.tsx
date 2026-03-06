@@ -1,28 +1,20 @@
-import React from 'react';
-import { Inter } from 'next/font/google';
-import './globals.css';
-
-const inter = Inter({ subsets: ['latin'] });
+import { ReactNode } from "react";
+import "./globals.css";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
 export const metadata = {
-  title: 'Bookify',
-  description: 'Customizable booking solutions for niche events and businesses.',
+  title: "Bookify",
+  description: "Customizable booking solutions for niche events and businesses.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <header className="bg-white shadow">
-          <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold">Effortless Booking Tailored for Your Niche Events</h1>
-            <p className="text-lg">{metadata.description}</p>
-          </div>
-        </header>
+      <body className="bg-gray-100">
+        <Navbar />
         <main className="container mx-auto p-4">{children}</main>
-        <footer className="bg-gray-200 text-center p-4">
-          <p>&copy; {new Date().getFullYear()} Bookify. All rights reserved.</p>
-        </footer>
+        <Footer />
       </body>
     </html>
   );
